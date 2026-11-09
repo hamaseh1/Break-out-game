@@ -39,5 +39,12 @@ public class Ball {
     public void setVy(double speed){
         this.vy = speed;
     }
+    private boolean launched = false;
+    public boolean getLaunched(){
+        return launched;
+    }
+    public void setLaunched(boolean launched){
+        this.launched = launched;
+    }
 
 }

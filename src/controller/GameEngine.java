@@ -14,6 +14,14 @@ public class GameEngine implements KeyListener{
         else if (keyEvent.getKeyCode() == KeyEvent.VK_RIGHT){
             movePaddleRight();
         }
+        else if (keyEvent.getKeyCode() == KeyEvent.VK_SPACE){
+            if (gameModel.getBall().getLaunched() == false){
+                 gameModel.getBall().setVx(0);
+                 gameModel.getBall().setVy(-6);
+                 gameModel.getBall().setLaunched(true);
+            }
+
+        }
     }
     public void keyReleased(KeyEvent keyEvent){
 
@@ -30,8 +38,20 @@ public class GameEngine implements KeyListener{
         gameTimer = new Timer(16 , new ActionListener() {
             @Override 
             public void actionPerformed(ActionEvent e){
-                gameModel.getBall().move();
-                canvas.updateBall();
+                if(gameModel.getBall().getLaunched() ==  true){
+                    gameModel.getBall().move();
+                    canvas.updateBall();
+                }
+                if (gameModel.getBall().getX() >= 800 - 16){
+                    gameModel.getBall().setVx( - gameModel.getBall().getVx());
+                }
+                else if (gameModel.getBall().getX() <= 0){
+                    gameModel.getBall().setVx( - gameModel.getBall().getVx());
+                }
+                if (gameModel.getBall().getY() <= 0){
+                    gameModel.getBall().setVy( - gameModel.getBall().getVy());
+                }
+
             }
         });
         canvas.addKeyListener(this);
@@ -40,10 +60,18 @@ public class GameEngine implements KeyListener{
     public void movePaddleLeft (){
         gameModel.getPaddle().moveLeft();
         canvas.updatePaddle();
+        if(gameModel.getBall().getLaunched() ==  false){
+            gameModel.getBall().setX(gameModel.getPaddle().getX() + ((gameModel.getPaddle().getWidth() - 16) / 2));
+            canvas.updateBall();
+        }  
     }
     public void movePaddleRight(){
         gameModel.getPaddle().moveRight();
         canvas.updatePaddle();
+        if(gameModel.getBall().getLaunched() ==  false){
+            gameModel.getBall().setX(gameModel.getPaddle().getX() + ((gameModel.getPaddle().getWidth() - 16) / 2));
+            canvas.updateBall();
+        }  
     }
 
 }
