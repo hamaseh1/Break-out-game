@@ -47,9 +47,18 @@ public class GameEngine implements KeyListener{
                 }
                 else if (gameModel.getBall().getX() <= 0){
                     gameModel.getBall().setVx( - gameModel.getBall().getVx());
-                }
-                if (gameModel.getBall().getY() <= 0){
+                } 
+                if (gameModel.getBall().getY() <= 0) {
                     gameModel.getBall().setVy( - gameModel.getBall().getVy());
+                }
+                if (gameModel.getBall().getSize() + gameModel.getBall().getX() >= gameModel.getPaddle().getX()
+                && gameModel.getBall().getX() <= gameModel.getPaddle().getX() + gameModel.getPaddle().getWidth()
+                && gameModel.getBall().getSize() + gameModel.getBall().getY() >= gameModel.getPaddle().getY()
+                && gameModel.getBall().getVy() > 0) {
+                    gameModel.getBall().setVy( - gameModel.getBall().getVy());
+                    gameModel.getBall().setY(gameModel.getPaddle().getY() - gameModel.getBall().getSize());
+                    canvas.updateBall();
+
                 }
 
             }

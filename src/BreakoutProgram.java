@@ -11,12 +11,12 @@ public class BreakoutProgram extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GameModel model = new GameModel();
         BreakoutCanvas canvas = new BreakoutCanvas(model);
-        GameEngine gameengine = new GameEngine(model, canvas);
+        GameEngine gameEngine = new GameEngine(model, canvas);
         add(canvas);
         setVisible(true);
     }
     public static void main(String[] args) {
         BreakoutProgram breakoutProgram = new BreakoutProgram();
-        
+
     }
 }

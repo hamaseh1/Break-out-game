@@ -4,6 +4,7 @@ public class Ball {
     private double y;
     private double vx;
     private double vy;
+    private double size = 16;
     public Ball(double x, double  y, double vx, double vy){
         this.x = x;
         this.y = y;
@@ -45,6 +46,9 @@ public class Ball {
     }
     public void setLaunched(boolean launched){
         this.launched = launched;
+    }
+    public double getSize(){
+        return size;
     }
 
 }
