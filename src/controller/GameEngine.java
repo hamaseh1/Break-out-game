@@ -10,16 +10,22 @@ import java.awt.event.ActionEvent;
 public class GameEngine implements KeyListener{
     public void keyPressed(KeyEvent keyEvent){
         if (keyEvent.getKeyCode() == KeyEvent.VK_LEFT){
-            holdLeftKey = true;
+            if(gameModel.getLives() > 0){
+                holdLeftKey = true;
+            }
         }
         else if (keyEvent.getKeyCode() == KeyEvent.VK_RIGHT){
-            holdRightKey = true;
+            if(gameModel.getLives() > 0){
+                holdRightKey = true;
+            }
         }
         else if (keyEvent.getKeyCode() == KeyEvent.VK_SPACE){
             if (gameModel.getBall().getLaunched() == false){
-                 gameModel.getBall().setVx(0);
-                 gameModel.getBall().setVy(-6);
-                 gameModel.getBall().setLaunched(true);
+                if( gameModel.getLives() > 0){
+                    gameModel.getBall().setVx(0);
+                    gameModel.getBall().setVy(-6);
+                    gameModel.getBall().setLaunched(true);
+                }
             }
 
         }
@@ -48,10 +54,14 @@ public class GameEngine implements KeyListener{
             @Override 
             public void actionPerformed(ActionEvent e){
                 if (holdLeftKey == true){
-                    movePaddleLeft();
+                    if(gameModel.getLives() > 0){
+                        movePaddleLeft();
+                    }
                 }
                 if(holdRightKey == true){
-                    movePaddleRight();
+                    if(gameModel.getLives() > 0){
+                        movePaddleRight();
+                    }
                 }
                 if(gameModel.getBall().getLaunched() ==  true){
                     gameModel.getBall().move();
@@ -82,6 +92,7 @@ public class GameEngine implements KeyListener{
                         gameModel.getBall().setY(gameModel.getPaddle().getY() - gameModel.getBall().getSize());
                         canvas.updateBall();
                     }
+                    boolean collision = false;
                     for( int r = 0; r < 5; r ++){
                         for(int c = 0; c < 8; c ++){
                             Brick brick = gameModel.getBricks()[r][c];
@@ -96,11 +107,26 @@ public class GameEngine implements KeyListener{
                                     double overLapY = Math.min(gameModel.getBall().getY() + gameModel.getBall().getSize(),
                                     gameModel.getBricks()[r][c].getY() +  gameModel.getBricks()[r][c].getHeight())
                                     - Math.max(gameModel.getBall().getY(), gameModel.getBricks()[r][c].getY());
-                                    if (overLapX < overLapY){
-                                        gameModel.getBall().setVx(- gameModel.getBall().getVx());
-                                    }
-                                    else{
-                                        gameModel.getBall().setVy(- gameModel.getBall().getVy());
+                                    if(collision == false){
+                                        if (overLapX < overLapY){
+                                            if(gameModel.getBall().getVx() > 0){
+                                                gameModel.getBall().setX(brick.getX() - gameModel.getBall().getSize());
+                                            }
+                                            else if(gameModel.getBall().getVx() < 0){
+                                                gameModel.getBall().setX(brick.getX() + brick.getWidth());
+                                            }
+                                            gameModel.getBall().setVx(- gameModel.getBall().getVx());
+                                        }
+                                        else{
+                                            if(gameModel.getBall().getVy() > 0){
+                                                gameModel.getBall().setY(brick.getY() - gameModel.getBall().getSize());
+                                            }
+                                            else if(gameModel.getBall().getVy() < 0){
+                                                gameModel.getBall().setY(brick.getY() + brick.getHeight());
+                                            }
+                                            gameModel.getBall().setVy(- gameModel.getBall().getVy());
+                                        }
+                                        collision = true;
                                     }
                                     brick.destroy();
                                     canvas.removeBrick(r, c);
@@ -112,6 +138,11 @@ public class GameEngine implements KeyListener{
                     if(gameModel.getBall().getY() + gameModel.getBall().getSize() >= gameModel.getScreenHeight()
                     && gameModel.getBall().getLaunched()){
                         gameModel.decreaseLives();
+                        canvas.updateLivesLabel();
+                        if(gameModel.getLives() == 0){
+                            canvas.showGameOver();
+                            gameTimer.stop();
+                        }
                         gameModel.getBall().setLaunched(false);
                         gameModel.getBall().setX(gameModel.getPaddle().getCenterX() - (gameModel.getBall().getSize() / 2.0));
                         gameModel.getBall().setY(gameModel.getPaddle().getY() - gameModel.getBall().getSize());
