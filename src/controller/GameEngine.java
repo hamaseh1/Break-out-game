@@ -1,4 +1,5 @@
 package controller;
+import model.Brick;
 import model.GameModel;
 import view.BreakoutCanvas;
 import java.awt.event.KeyListener;
@@ -9,10 +10,10 @@ import java.awt.event.ActionEvent;
 public class GameEngine implements KeyListener{
     public void keyPressed(KeyEvent keyEvent){
         if (keyEvent.getKeyCode() == KeyEvent.VK_LEFT){
-            movePaddleLeft();
+            holdLeftKey = true;
         }
         else if (keyEvent.getKeyCode() == KeyEvent.VK_RIGHT){
-            movePaddleRight();
+            holdRightKey = true;
         }
         else if (keyEvent.getKeyCode() == KeyEvent.VK_SPACE){
             if (gameModel.getBall().getLaunched() == false){
@@ -24,6 +25,12 @@ public class GameEngine implements KeyListener{
         }
     }
     public void keyReleased(KeyEvent keyEvent){
+        if(keyEvent.getKeyCode() == KeyEvent.VK_LEFT){
+            holdLeftKey = false;
+        }
+        if(keyEvent.getKeyCode() == KeyEvent.VK_RIGHT){
+            holdRightKey = false;
+        }
 
     }
     public void keyTyped(KeyEvent keyEvent){
@@ -32,35 +39,86 @@ public class GameEngine implements KeyListener{
     private GameModel gameModel;
     private BreakoutCanvas canvas;
     private Timer gameTimer;
+    private boolean holdLeftKey = false;
+    private boolean holdRightKey = false;
     public GameEngine(GameModel model, BreakoutCanvas canvas){
         this.gameModel = model;
         this.canvas = canvas;
         gameTimer = new Timer(16 , new ActionListener() {
             @Override 
             public void actionPerformed(ActionEvent e){
+                if (holdLeftKey == true){
+                    movePaddleLeft();
+                }
+                if(holdRightKey == true){
+                    movePaddleRight();
+                }
                 if(gameModel.getBall().getLaunched() ==  true){
                     gameModel.getBall().move();
                     canvas.updateBall();
-                }
-                if (gameModel.getBall().getX() >= 800 - 16){
+                    if (gameModel.getBall().getX() >= gameModel.getScreenWidth() - gameModel.getBall().getSize()){
                     gameModel.getBall().setVx( - gameModel.getBall().getVx());
+                    gameModel.getBall().setX(gameModel.getScreenWidth() - gameModel.getBall().getSize());
+                    }
+                    else if (gameModel.getBall().getX() <= 0){
+                        gameModel.getBall().setVx( - gameModel.getBall().getVx());
+                        gameModel.getBall().setX(0);
+                    } 
+                    if (gameModel.getBall().getY() <= 0) {
+                        gameModel.getBall().setVy( - gameModel.getBall().getVy());
+                        gameModel.getBall().setY(0);
+                    }
+                    if (gameModel.getBall().getSize() + gameModel.getBall().getX() >= gameModel.getPaddle().getX()
+                    && gameModel.getBall().getX() <= gameModel.getPaddle().getX() + gameModel.getPaddle().getWidth()
+                    && gameModel.getBall().getSize() + gameModel.getBall().getY() >= gameModel.getPaddle().getY()
+                    && gameModel.getBall().getVy() > 0) {
+                        double deltaX = gameModel.getBall().getCenterX() - gameModel.getPaddle().getCenterX();
+                        double offset = deltaX / (gameModel.getPaddle().getWidth() / 2.0 );
+                        offset = Math.max(-1, Math.min(1, offset));
+                        double angle = offset * Math.toRadians(60);
+                        double speed = Math.hypot(gameModel.getBall().getVx(), gameModel.getBall().getVy());
+                        gameModel.getBall().setVx(speed * Math.sin(angle));
+                        gameModel.getBall().setVy(- Math.abs(speed * Math.cos(angle)));
+                        gameModel.getBall().setY(gameModel.getPaddle().getY() - gameModel.getBall().getSize());
+                        canvas.updateBall();
+                    }
+                    for( int r = 0; r < 5; r ++){
+                        for(int c = 0; c < 8; c ++){
+                            Brick brick = gameModel.getBricks()[r][c];
+                            if(brick.isActive()){
+                                if(gameModel.getBall().getX() <= gameModel.getBricks()[r][c].getX() + gameModel.getBricks()[r][c].getWidth()
+                                && gameModel.getBall().getX() + gameModel.getBall().getSize() >= gameModel.getBricks()[r][c].getX()
+                                && gameModel.getBall().getY() + gameModel.getBall().getSize() >= gameModel.getBricks()[r][c].getY()
+                                && gameModel.getBall().getY() <= gameModel.getBricks()[r][c].getY() + gameModel.getBricks()[r][c].getHeight()){
+                                    double overLapX = Math.min(gameModel.getBall().getX() + gameModel.getBall().getSize(),
+                                    gameModel.getBricks()[r][c].getX() +  gameModel.getBricks()[r][c].getWidth())
+                                    - Math.max(gameModel.getBall().getX(), gameModel.getBricks()[r][c].getX());
+                                    double overLapY = Math.min(gameModel.getBall().getY() + gameModel.getBall().getSize(),
+                                    gameModel.getBricks()[r][c].getY() +  gameModel.getBricks()[r][c].getHeight())
+                                    - Math.max(gameModel.getBall().getY(), gameModel.getBricks()[r][c].getY());
+                                    if (overLapX < overLapY){
+                                        gameModel.getBall().setVx(- gameModel.getBall().getVx());
+                                    }
+                                    else{
+                                        gameModel.getBall().setVy(- gameModel.getBall().getVy());
+                                    }
+                                    brick.destroy();
+                                    canvas.removeBrick(r, c);
+                                    gameModel.increaseScore();
+                                }
+                            }
+                        }
+                    }
+                    if(gameModel.getBall().getY() + gameModel.getBall().getSize() >= gameModel.getScreenHeight()
+                    && gameModel.getBall().getLaunched()){
+                        gameModel.decreaseLives();
+                        gameModel.getBall().setLaunched(false);
+                        gameModel.getBall().setX(gameModel.getPaddle().getCenterX() - (gameModel.getBall().getSize() / 2.0));
+                        gameModel.getBall().setY(gameModel.getPaddle().getY() - gameModel.getBall().getSize());
+                        canvas.updateBall();
+                    }
                 }
-                else if (gameModel.getBall().getX() <= 0){
-                    gameModel.getBall().setVx( - gameModel.getBall().getVx());
-                } 
-                if (gameModel.getBall().getY() <= 0) {
-                    gameModel.getBall().setVy( - gameModel.getBall().getVy());
-                }
-                if (gameModel.getBall().getSize() + gameModel.getBall().getX() >= gameModel.getPaddle().getX()
-                && gameModel.getBall().getX() <= gameModel.getPaddle().getX() + gameModel.getPaddle().getWidth()
-                && gameModel.getBall().getSize() + gameModel.getBall().getY() >= gameModel.getPaddle().getY()
-                && gameModel.getBall().getVy() > 0) {
-                    gameModel.getBall().setVy( - gameModel.getBall().getVy());
-                    gameModel.getBall().setY(gameModel.getPaddle().getY() - gameModel.getBall().getSize());
-                    canvas.updateBall();
-
-                }
-
+                
             }
         });
         canvas.addKeyListener(this);

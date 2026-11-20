@@ -51,5 +51,8 @@ public class Paddle {
     public void setY(double value){
         this.y = value;
     }
+    public double getCenterX(){
+        return getX() + (getWidth() / 2.0 );
+    }
 
 }

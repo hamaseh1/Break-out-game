@@ -50,5 +50,8 @@ public class Ball {
     public double getSize(){
         return size;
     }
+    public double getCenterX(){
+        return getX() + (getSize() / 2.0 );
+    }
 
 }

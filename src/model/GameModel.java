@@ -6,6 +6,8 @@ public class GameModel {
     private Brick[][] bricks;
     private int score;
     private int lives;
+    private int screenWidth = 800;
+    private int screenHeight = 600;
     public GameModel() {
         score = 0;
         lives = 3;
@@ -36,5 +38,17 @@ public class GameModel {
     }
     public int getLives() {
         return lives;
+    }
+    public void increaseScore(){
+         score += 100;
+    }
+    public int getScreenWidth(){
+        return screenWidth;
+    }
+    public int getScreenHeight(){
+        return screenHeight;
+    }
+    public void decreaseLives(){
+        lives -= 1;
     }
 }
