@@ -24,7 +24,7 @@ public class BreakoutCanvas extends GCanvas {
         paddleShape = new GRect(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight());
         ballShape = new GOval(ball.getX(), ball.getY(), 16, 16);
         livesLabel = new GLabel("lives : "  + gameModel.getLives(), 20, 30);
-        gameOverLabel = new GLabel("GAME OVER", 400, 300);
+        gameOverLabel = new GLabel("GAME OVER", 300, 300);
         add(paddleShape);
         add(ballShape);
         add(livesLabel);
