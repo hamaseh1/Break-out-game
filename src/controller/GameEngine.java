@@ -2,6 +2,7 @@ package controller;
 import model.Brick;
 import model.GameModel;
 import view.BreakoutCanvas;
+import storage.HighScoreStorage;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import javax.swing.Timer;
@@ -29,6 +30,27 @@ public class GameEngine implements KeyListener{
             }
 
         }
+        if(gameModel.getLives() == 0 || gameEnded == true){
+            if(keyEvent.getKeyCode() == KeyEvent.VK_R){
+                gameModel.resetGame();
+                holdLeftKey = false;
+                holdRightKey = false;
+                canvas.resetCanvas();
+                gameEnded = false;
+                isPaused = false;
+                gameTimer.start();
+            }
+        }
+        if(keyEvent.getKeyCode() == KeyEvent.VK_P){
+            if(isPaused == false){
+                isPaused = true;
+                canvas.showPaused();
+            }
+            else if (isPaused == true){
+                isPaused = false;
+                canvas.removePaused();
+            }
+        }
     }
     public void keyReleased(KeyEvent keyEvent){
         if(keyEvent.getKeyCode() == KeyEvent.VK_LEFT){
@@ -44,15 +66,24 @@ public class GameEngine implements KeyListener{
     }
     private GameModel gameModel;
     private BreakoutCanvas canvas;
+    private HighScoreStorage highScoreStorage;
+    private boolean isPaused = false;
+    private boolean gameEnded = false;
     private Timer gameTimer;
     private boolean holdLeftKey = false;
     private boolean holdRightKey = false;
-    public GameEngine(GameModel model, BreakoutCanvas canvas){
+    public GameEngine(GameModel model, BreakoutCanvas canvas, HighScoreStorage highScoreStorage){
         this.gameModel = model;
         this.canvas = canvas;
+        this.highScoreStorage = highScoreStorage;
+        int highscore = highScoreStorage.loadHighScore();
+        canvas.highScore(highscore);
         gameTimer = new Timer(16 , new ActionListener() {
             @Override 
             public void actionPerformed(ActionEvent e){
+                if(isPaused == true){
+                    return ;
+                }
                 if (holdLeftKey == true){
                     if(gameModel.getLives() > 0){
                         movePaddleLeft();
@@ -64,6 +95,8 @@ public class GameEngine implements KeyListener{
                     }
                 }
                 if(gameModel.getBall().getLaunched() ==  true){
+                    double previousX = gameModel.getBall().getX();
+                    double previousY = gameModel.getBall().getY();
                     gameModel.getBall().move();
                     canvas.updateBall();
                     if (gameModel.getBall().getX() >= gameModel.getScreenWidth() - gameModel.getBall().getSize()){
@@ -80,8 +113,11 @@ public class GameEngine implements KeyListener{
                     }
                     if (gameModel.getBall().getSize() + gameModel.getBall().getX() >= gameModel.getPaddle().getX()
                     && gameModel.getBall().getX() <= gameModel.getPaddle().getX() + gameModel.getPaddle().getWidth()
-                    && gameModel.getBall().getSize() + gameModel.getBall().getY() >= gameModel.getPaddle().getY()
-                    && gameModel.getBall().getVy() > 0) {
+                    && previousX +gameModel.getBall().getSize() >= gameModel.getPaddle().getX()
+                    && previousX <= gameModel.getPaddle().getX() + gameModel.getPaddle().getWidth()
+                    && gameModel.getBall().getVy() > 0
+                    && previousY + gameModel.getBall().getSize() < gameModel.getPaddle().getY()
+                    && gameModel.getBall().getY() + gameModel.getBall().getSize() >= gameModel.getPaddle().getY()) {
                         double deltaX = gameModel.getBall().getCenterX() - gameModel.getPaddle().getCenterX();
                         double offset = deltaX / (gameModel.getPaddle().getWidth() / 2.0 );
                         offset = Math.max(-1, Math.min(1, offset));
@@ -131,6 +167,20 @@ public class GameEngine implements KeyListener{
                                     brick.destroy();
                                     canvas.removeBrick(r, c);
                                     gameModel.increaseScore();
+                                    canvas.showScores();
+                                    if(gameModel.allBricksDestroyed() == true ){
+                                        gameModel.getBall().setLaunched(false);
+                                        gameModel.getBall().setVx(0);
+                                        gameModel.getBall().setVy(0);
+                                        canvas.showWin();
+                                        canvas.finalScore();
+                                        highScoreStorage.saveHighScore(gameModel.getScore());
+                                        int loadHighScore = highScoreStorage.loadHighScore();
+                                        canvas.showHighScore(loadHighScore);
+                                        gameEnded = true;
+                                        gameTimer.stop();
+
+                                    }
                                 }
                             }
                         }
@@ -141,6 +191,11 @@ public class GameEngine implements KeyListener{
                         canvas.updateLivesLabel();
                         if(gameModel.getLives() == 0){
                             canvas.showGameOver();
+                            highScoreStorage.saveHighScore(gameModel.getScore());
+                            int loadHighScore = highScoreStorage.loadHighScore();
+                            canvas.showHighScore(loadHighScore);
+                            canvas.finalScore();
+                            gameEnded = true;
                             gameTimer.stop();
                         }
                         gameModel.getBall().setLaunched(false);

@@ -3,6 +3,7 @@ import javax.swing.JFrame;
 import controller.GameEngine;
 import model.GameModel;
 import view.BreakoutCanvas;
+import storage.InMemoryScoreStorage;
 
 public class BreakoutProgram extends JFrame {
     public BreakoutProgram(){
@@ -11,7 +12,8 @@ public class BreakoutProgram extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GameModel model = new GameModel();
         BreakoutCanvas canvas = new BreakoutCanvas(model);
-        GameEngine gameEngine = new GameEngine(model, canvas);
+        InMemoryScoreStorage highscore = new InMemoryScoreStorage();
+        GameEngine gameEngine = new GameEngine(model, canvas, highscore);
         add(canvas);
         setVisible(true);
     }
