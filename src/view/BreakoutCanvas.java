@@ -15,6 +15,7 @@ public class BreakoutCanvas extends GCanvas {
     private GRoundRect paddleShape;
     private GOval ballShape;
     private GRoundRect[][] brickShape;
+    private GRect rect;
     private GLabel livesLabel;
     private GLabel gameOverLabel;
     private GLabel scoresLabel;
@@ -36,20 +37,24 @@ public class BreakoutCanvas extends GCanvas {
         ballShape = new GOval(ball.getX(), ball.getY(), 16, 16);
         ballShape.setColor(Color.decode("#E9C78D"));
         ballShape.setFilled(true);
-        livesLabel = new GLabel("lives : "  + gameModel.getLives(), 20, 30);
-        scoresLabel = new GLabel("Score : " + gameModel.getScore(), 20, 50);
+        rect = new GRect(0, 0, 800, 35);
+        rect.setColor(Color.decode("#45415E"));
+        rect.setFilled(true);
+        livesLabel = new GLabel("lives : "  + gameModel.getLives(), 20, 25);
+        scoresLabel = new GLabel("Score : " + gameModel.getScore(), 180, 25);
         livesLabel.setColor(Color.decode("#E9A5C8"));
         scoresLabel.setColor(Color.decode("#E9C78D"));
         scoresLabel.setFont("Monospaced-bold-18");
         livesLabel.setFont("Monospaced-bold-18");
         add(paddleShape);
         add(ballShape);
+        add(rect);
         add(livesLabel);
         add(scoresLabel);
         for( int r = 0; r < 5; r ++){
             for(int c = 0; c < 8; c ++){
                 if(bricks[r][c].isActive() == true){
-                    brickShape[r][c] = new GRoundRect(bricks[r][c].getX(), bricks[r][c].getY(), bricks[r][c].getWidth(), bricks[r][c].getHeight());
+                    brickShape[r][c] = new GRoundRect(bricks[r][c].getX(), bricks[r][c].getY(), bricks[r][c].getWidth(), bricks[r][c].getHeight() ,5, 5);
                     if (r == 0) {
                         brickShape[r][c].setColor(Color.decode("#E9A5C8"));
                     }
@@ -114,9 +119,10 @@ public class BreakoutCanvas extends GCanvas {
     }
     public void highScore(int highscore){
         this.highScore = highscore;
-        highScoreLabel = new GLabel("High Score : " + highscore, 600, 30);
+        highScoreLabel = new GLabel("High Score : " + highscore, 0, 0);
         highScoreLabel.setColor(Color.decode("#E9C78D"));
         highScoreLabel.setFont("Monospaced-bold-18");
+        highScoreLabel.setLocation(800 - highScoreLabel.getWidth() - 20, 25);
         add(highScoreLabel);
     }
     public void showHighScore(int highscore){
@@ -142,20 +148,24 @@ public class BreakoutCanvas extends GCanvas {
         ballShape = new GOval(ball.getX(), ball.getY(), 16, 16);
         ballShape.setColor(Color.decode("#E9C78D"));
         ballShape.setFilled(true);
-        livesLabel = new GLabel("lives : "  + gameModel.getLives(), 20, 30);
-        scoresLabel = new GLabel("Score : " + gameModel.getScore(), 20, 50);
+        rect = new GRect(0, 0, 800, 35);
+        rect.setColor(Color.decode("#45415E"));
+        rect.setFilled(true);
+        livesLabel = new GLabel("lives : "  + gameModel.getLives(), 20, 25);
+        scoresLabel = new GLabel("Score : " + gameModel.getScore(), 180, 25);
         livesLabel.setColor(Color.decode("#E9A5C8"));
         scoresLabel.setColor(Color.decode("#E9C78D"));
         scoresLabel.setFont("Monospaced-bold-18");
         livesLabel.setFont("Monospaced-bold-18");
         add(paddleShape);
         add(ballShape);
+        add(rect);
         add(livesLabel);
         add(scoresLabel);
         for( int r = 0; r < 5; r ++){
             for(int c = 0; c < 8; c ++){
                 if(bricks[r][c].isActive() == true){
-                    brickShape[r][c] = new GRoundRect(bricks[r][c].getX(), bricks[r][c].getY(), bricks[r][c].getWidth(), bricks[r][c].getHeight());
+                    brickShape[r][c] = new GRoundRect(bricks[r][c].getX(), bricks[r][c].getY(), bricks[r][c].getWidth(), bricks[r][c].getHeight(), 5, 5);
                     if (r == 0) {
                         brickShape[r][c].setColor(Color.decode("#E9A5C8"));
                     }
@@ -177,9 +187,10 @@ public class BreakoutCanvas extends GCanvas {
 
             }
         }
-        highScoreLabel = new GLabel("High Score : " + this.highScore, 600, 30);
+        highScoreLabel = new GLabel("High Score : " + this.highScore, 0, 0);
         highScoreLabel.setColor(Color.decode("#E9C78D"));
         highScoreLabel.setFont("Monospaced-bold-18");
+        highScoreLabel.setLocation(800 - highScoreLabel.getWidth() - 20, 25);
         add(highScoreLabel);
     }
 

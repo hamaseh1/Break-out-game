@@ -30,16 +30,14 @@ public class GameEngine implements KeyListener{
             }
 
         }
-        if(gameModel.getLives() == 0 || gameEnded == true){
-            if(keyEvent.getKeyCode() == KeyEvent.VK_R){
-                gameModel.resetGame();
-                holdLeftKey = false;
-                holdRightKey = false;
-                canvas.resetCanvas();
-                gameEnded = false;
-                isPaused = false;
-                gameTimer.start();
-            }
+        if(keyEvent.getKeyCode() == KeyEvent.VK_R){
+            gameModel.resetGame();
+            holdLeftKey = false;
+            holdRightKey = false;
+            canvas.resetCanvas();
+            gameEnded = false;
+            isPaused = false;
+            gameTimer.start();
         }
         if(keyEvent.getKeyCode() == KeyEvent.VK_P){
             if(isPaused == false){
