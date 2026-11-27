@@ -1,6 +1,7 @@
 package controller;
 import model.Brick;
 import model.GameModel;
+import model.GameState;
 import view.BreakoutCanvas;
 import storage.HighScoreStorage;
 import java.awt.event.KeyListener;
@@ -26,6 +27,7 @@ public class GameEngine implements KeyListener{
                     gameModel.getBall().setVx(0);
                     gameModel.getBall().setVy(-6);
                     gameModel.getBall().setLaunched(true);
+                    gameState = GameState.RUNNING;
                 }
             }
 
@@ -35,17 +37,16 @@ public class GameEngine implements KeyListener{
             holdLeftKey = false;
             holdRightKey = false;
             canvas.resetCanvas();
-            gameEnded = false;
-            isPaused = false;
+            gameState = GameState.READY;
             gameTimer.start();
         }
         if(keyEvent.getKeyCode() == KeyEvent.VK_P){
-            if(isPaused == false){
-                isPaused = true;
+            if(gameState == GameState.RUNNING){
+                gameState = GameState.PAUSED;
                 canvas.showPaused();
             }
-            else if (isPaused == true){
-                isPaused = false;
+            else if (gameState == GameState.PAUSED){
+                gameState = GameState.RUNNING;
                 canvas.removePaused();
             }
         }
@@ -65,8 +66,7 @@ public class GameEngine implements KeyListener{
     private GameModel gameModel;
     private BreakoutCanvas canvas;
     private HighScoreStorage highScoreStorage;
-    private boolean isPaused = false;
-    private boolean gameEnded = false;
+    private GameState gameState = GameState.READY;
     private Timer gameTimer;
     private boolean holdLeftKey = false;
     private boolean holdRightKey = false;
@@ -79,7 +79,7 @@ public class GameEngine implements KeyListener{
         gameTimer = new Timer(16 , new ActionListener() {
             @Override 
             public void actionPerformed(ActionEvent e){
-                if(isPaused == true){
+                if(gameState == GameState.PAUSED){
                     return ;
                 }
                 if (holdLeftKey == true){
@@ -175,7 +175,7 @@ public class GameEngine implements KeyListener{
                                         highScoreStorage.saveHighScore(gameModel.getScore());
                                         int loadHighScore = highScoreStorage.loadHighScore();
                                         canvas.showHighScore(loadHighScore);
-                                        gameEnded = true;
+                                        gameState = GameState.WON;
                                         gameTimer.stop();
 
                                     }
@@ -193,7 +193,7 @@ public class GameEngine implements KeyListener{
                             int loadHighScore = highScoreStorage.loadHighScore();
                             canvas.showHighScore(loadHighScore);
                             canvas.finalScore();
-                            gameEnded = true;
+                            gameState = GameState.GAME_OVER;
                             gameTimer.stop();
                         }
                         gameModel.getBall().setLaunched(false);
